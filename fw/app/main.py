@@ -1,12 +1,16 @@
 import mqtt_call
+from machine import Pin, I2C
 
 import sys
 sys.path.append('/')
 import site_config
 
-
 print('MQTT to I2C bridge')
 print('Name:', site_config.name)
+
+act_led = Pin(site_config.act_led, Pin.OUT, value=0)
+
+i2c = I2C(0, scl=Pin(site_config.scl_pin), sda=Pin(site_config.sda_pin), freq=400000)
 
 class Handler:
 
@@ -16,11 +20,23 @@ class Handler:
 
 
     def export_read(self, address):
-        return address + 100
+
+        act_led.value(1)
+        try:
+            data = i2c.readfrom(address, 1)
+            return data[0]
+        finally:
+            act_led.value(0)
 
     def export_write(self, address, value):
-        return address + value
+        act_led.value(1)
+        try:
+            i2c.writeto(address, bytes(value))
+        finally:
+            act_led.value(0)
 
+    def export_scan(self):
+        return i2c.scan()
 
     def export_get_status(self):
         return {
