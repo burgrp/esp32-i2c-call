@@ -1,0 +1,6 @@
+wifi_ssid = '416T'
+wifi_password='????'
+wifi_led=12
+mqtt_broker='10.1.0.12'
+debug=False
+name='i2c-test0'
